@@ -1,0 +1,47 @@
+schema: workflow/2022.04
+name: Speech to Notion (Code)
+triggers:
+- id: dc_QyukN4E
+steps:
+- namespace: Download_to_tmp
+  runtime: nodejs18.x
+  uses: "./Download_to_tmp/entry.js"
+- namespace: get_duration
+  runtime: nodejs18.x
+  uses: "./get_duration/entry.js"
+- namespace: create_transcription
+  runtime: nodejs18.x
+  uses: openai-create-transcription@0.0.5
+  _props_cursor: dyp_MeUvXdj
+  props:
+    openai:
+      authProvisionId: apn_Jjh5wZE
+    uploadType: File
+    language: en
+    path: "{{steps.Download_to_tmp.$return_value.tmpPath}}"
+    responseFormat: json
+- namespace: openai_chat
+  runtime: nodejs18.x
+  uses: "./openai_chat/entry.js"
+  props:
+    openai:
+      authProvisionId: apn_Jjh5wZE
+- namespace: format_chat
+  runtime: nodejs18.x
+  uses: "./format_chat/entry.js"
+- namespace: make_paragraphs
+  runtime: nodejs18.x
+  uses: "./make_paragraphs/entry.js"
+- namespace: notion
+  runtime: nodejs18.x
+  uses: "./notion/entry.js"
+  props:
+    notion:
+      authProvisionId: apn_mnhv45Q
+- namespace: update_page
+  runtime: nodejs18.x
+  uses: "./update_page/entry.js"
+  props:
+    notion:
+      authProvisionId: apn_mnhv45Q
+
